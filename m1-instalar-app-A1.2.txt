@@ -1,0 +1,393 @@
+Cómo agregar una impresora compartida en Windows Server:
+
+       - Explicaré cómo agregar una impresora compartida en un servidor Windows con la función de servidor de impresión.
+         Abra la consola de administración de impresión: En el servidor, abra Print Management MMC y haga clic con el
+         botón derecho en Impresora y haga clic en Agregar una impresora.
+
+         _ Elija el tipo de instalación: Según el tipo de impresora, elija el tipo de instalación.
+         _ Configure el tipo de puerto y la dirección IP
+         - Configuración del controlador: Elija el controlador de la impresora
+         - Nombre de la impresora: Configure el nombre así como su nombre compartido.
+         - Resumen de la impresora: Se muestra un resumen de la impresora agregada
+         - Impresora instalada: La impresora está instalada en el servidor todo lo que tiene que haver es implementar.
+
+
+
+Cómo habilitar y configurar cuotas de disco de usuario en Windows
+
+     -Las cuotas de disco permiten a los administradores de Windows controlar y limitar la cantidad de espacio en disco
+      que usan los usuarios en los sistemas de archivos de servidores y estaciones de trabajo. Windows Server admite dos
+      tipos de cuotas de disco: Cuotas del Administrador de recursos del servidor de archivos y Cuotas de NTFS.
+
+     -Comprensión de las cuotas de disco NTFS en Windows
+      Puede utilizar las cuotas de disco de Windows para limitar el tamaño máximo de archivos y carpetas para cada usuario
+       para que no consuman todos el espacio en disco con sus datos. Las cuotas de disco están disponibles tanto en el
+       servidor como en la versión de escritorio de Windows.
+
+      -Habilitar cuotas de disco en Windows 10 / Windows Server 2016:
+      -Abra la ventana de propiedades del disco, en la que desea habilitar las cuotas, vaya a la Cuota pestaña.
+       Luego haga clic en Mostrar configuración de cuotas:
+
+      -Para habilitar las cuotas para este volumen, marque Habilitar la gestión de cuotas.
+
+       Es posible que se verifiquen las siguientes opciones según el escenario de uso de la cuota:
+
+       Denegar espacio en disco a los usuarios que superen el límite de la cuota - evitar que los usuarios que han
+       superado el límite de cuota escriban en el disco;
+       Limite el espacio en disco a - establecer un límite en el tamaño total de archivos para un usuario;
+       Registrar evento cuando un usuario excede su límite de cuota - registra un evento en el Visor de eventos si un
+       usuario excede el límite de la cuota;
+       Registrar evento cuando un usuario excede su nivel de advertencia : Registra un evento cuando se alcanza el
+       umbral de la cuota.
+       No se recomienda habilitar la opción "Denegar espacio en disco a los usuarios que superen el límite de la cuota
+       " En seguida. Es preferible estimar la utilización actual del espacio en disco por parte de sus usuarios.
+       En nuestro ejemplo, queremos limitar a cada usuario a 1 GB de espacio en disco en el servidor.
+
+      -Guarde los cambios (Aplicar). En algún momento (según el tamaño del disco y la cantidad de archivos),
+      Windows contará el uso total del espacio en disco por cada usuario.
+
+       Haga clic en el Entradas de cuota botón. Verá una tabla resultante que muestra las cuotas y el tamaño actual
+       del espacio utilizado por cada usuario (cuyos archivos se encuentran en el sistema de archivos).
+       Aquí puede ver de un vistazo qué usuarios ya han superado sus cuotas de disco.
+
+      -De forma predeterminada, se establecen las mismas cuotas para todos los usuarios. Desde la ventana Entradas de cuota,
+       puede crear, aumentar o deshabilitar una configuración de cuota personalizada para un determinado usuario.
+
+       Para deshabilitar las cuotas de disco NTFS para una cuenta de usuario específica, abra las propiedades (Propiedades)
+        de la entrada en la tabla de cuotas y marque "No limite el uso del disco ".
+
+       Importante. Debe deshabilitar las cuotas para las cuentas del sistema NT Service TrustedInstaller y NT AUTHORITY SYSTEM;
+        de lo contrario, es posible que Windows no funcione correctamente.
+
+       -Desde la ventana de la lista de cuotas, puede exportar la configuración de su cuota y luego importarla y aplicarla
+       a otro disco o computadora.
+
+        Si desea mostrar una lista de archivos que se cuentan en la cuota de un usuario específico, debe seleccionar el
+        Borrar opción del menú.
+
+       Este cuadro de diálogo permite cambiar el propietario de un archivo específico (Tomar posesión), elimine o mueva el archivo.
+
+       Una vez que haya organizado sus cuotas suaves en el modo de auditoría, puede habilitar la Denegar espacio en disco
+        a los usuarios que superen el límite de la cuota opción. Esto habilitará el modo de cuotas de disco duro.
+        Ahora los usuarios no podrán exceder su espacio en disco asignado. Tenga en cuenta que el tamaño del disco en la
+        sesión del usuario ahora se muestra de acuerdo con las cuotas de disco existentes.
+
+    -Configurar cuotas de disco con la configuración de la política de grupo
+     Puede administrar la configuración de la cuota de disco en las computadoras y servidores del dominio mediante las
+     políticas de grupo. La configuración de la cuota se encuentra en la sección GPO: Configuración del equipo -> Plantillas
+     administrativas -> Sistema -> Cuotas de disco. Para habilitar cuotas de disco similares a las mencionadas anteriormente,
+      establezca las siguientes configuraciones en su GPO:
+
+     Habilitar cuotas de disco: Enable
+     Aplicar límite de cuota de disco: Enable
+     Límite de cuota predeterminado y nivel de advertencia: Enable
+     (Límite de cuota predeterminado / nivel de advertencia: 1 Gb)
+     Registrar evento cuando se excedió el límite de cuota: Enable
+     Aplicar la política a los medios extraíbles: Enable (si necesita aplicar cuotas para medios extraíbles,
+     incluidas unidades flash USB)
+
+        -Queda por asignar este GPO a la unidad organizativa con equipos / servidores en los que debe aplicar cuotas de
+         disco y esperar la actualización de la configuración de la política de grupo.
+
+         Las cuotas de disco configuradas a través de GPO se aplican a todos los discos de la computadora.
+         No puede configurar exclusiones para usuarios específicos.
+
+       -Administrar cuotas de disco mediante el símbolo del sistema / PowerShell
+        Las cuotas de NTFS también se pueden administrar desde el símbolo del sistema. Para hacerlo, el comando cuota
+        fsutil se utiliza.
+
+        Para habilitar la cuota flexible para un disco, use el comando:
+
+        fsutil quota track E:
+
+        Para habilitar la cuota NTFS estricta, ejecute:
+
+        fsutil quota enforce E:
+
+        Para deshabilitar completamente las cuotas de disco, use el comando:
+
+        fsutil quota disable E:
+
+        Para obtener la configuración de cuota actual para una unidad específica, ejecute:
+
+        fsutil quota query e:
+
+        Obtenga una lista de usuarios que ya han superado sus cuotas de disco:
+
+        fsutil quota violations
+
+        Para cambiar los umbrales de cuota para un usuario específico, use el comando:
+
+        fsutil quota modify E: 2000000000 100000000 corpaabrams
+
+        Los tamaños de las cuotas se especifican en bytes (2 GB en este ejemplo).
+         El primer valor es el tamaño máximo de los datos del usuario en el disco (cuota estricta),
+          el segundo es el límite en el que aparecen las advertencias (nivel de advertencia).
+
+        Descubra la frecuencia de actualización de las cuotas de disco (en segundos):
+
+        fsutil behavior query quotanotify
+
+        De forma predeterminada, las cuotas se actualizan una vez por hora.
+
+       -No hay cmdlets de PowerShell integrados para administrar cuotas de disco NTFS. Sin embargo,
+       se pueden gestionar mediante el Win32_DiskQuota Clase WMI. Por ejemplo, el siguiente script de PowerShell mostrará
+        información sobre las cuotas de usuarios actuales.
+
+
+        $strCom = "."
+        $colItems = get-wmiobject -class "Win32_DiskQuota" -namespace "rootCIMV2" -computername $strCom
+        foreach ($objItem in $colItems) {
+        write-host "Quota usage: " $objItem.DiskSpaceUsed
+        write-host "Quota Hard Limit: " $objItem.Limit
+        write-host "Drive: " $objItem.QuotaVolume
+        write-host "Status: " $objItem.Status
+        write-host "Username: " $objItem.User
+        write-host "Quota Warning Limit: " $objItem.WarningLimit
+        }
+
+Cómo instalar NextCloud en Ubuntu 20.04 con Apache
+
+      -Paso 1: Instalar el servidor LAMP
+
+         Nextcloud está escrito predominantemente en PHP y se accede a él en la interfaz desde un navegador.
+         El primer paso dicta que instalemos el servidor LAMP antes de saltar a cualquier otra cosa.
+         LAMP es un acrónimo que incluye Apache, que es un servidor web, motores de base de datos MySQL o MariaDB y
+         lenguaje de programación PHP.
+
+         Para instalar la pila LAMP ejecutaremos el comando que se muestra.
+
+             -comando ($ sudo apt install apache2 libapache2-mod-php php mariadb-server).
+
+      -Paso 2: Instale módulos PHP adicionales
+             Los módulos PHP adicionales son obligatorios para que continúe la instalación de Nextcloud. Son bastantes,
+             así que invoque el comando que se muestra.
+
+             -comando ($ sudo apt install php-gd php-mysql php-curl php-json php-gmp php-bcmath php-xml php-mbstring php-intl php-imagick php-zip bzip2).
+
+             Necesitamos hacer algunos ajustes al archivo php.ini que contiene los ajustes o configuraciones de PHP.
+
+              -comando ($ sudo vim /etc/php/7.4/apache2/php.ini).
+
+              Primero, configure el límite de memoria del valor predeterminado a 512M como se muestra en la captura de pantalla a continuación.
+              memory_limit = 512M
+
+              Además, configura tu zona horaria.
+              Ahora, reinicie el servidor web Apache para que se apliquen los cambios:
+
+               -comando ($ sudo systemctl restart apache2).
+
+               También sería prudente confirmar que el servidor web está funcionando como se muestra.
+
+               -comando ($ sudo systemctl status apache2).
+
+      -Paso 3: Cree una base de datos para NextCloud:
+
+            Es crucial crear una base de datos para los archivos de Nextcloud y otros datos que se guardarán después de la instalación.
+            Entonces, acceda al motor de la base de datos MariaDB como se muestra:
+
+            -comando ($ sudo mysql -u root -p).
+
+            Luego, proceda y cree la base de datos y el usuario de la base de datos y asigne los privilegios requeridos
+            como se proporciona en los comandos a continuación
+
+             -comando (CREATE DATABASE nextcloud_db;).
+
+            GRANT ALL ON nextcloud_db.* to 'nextcloud_user'@'localhost' IDENTIFIED BY 'userpassword';
+
+             Guarde los cambios en el motor de la base de datos.
+             FLUSH PRIVILEGES;
+             EXIT
+
+      -Paso 4: Descarga y configura NextCloud
+
+            Vamos a obtener el último archivo zip de NextCloud del sitio oficial de NextCloud . En este punto,
+            la última versión en NextCloud 21.0.1
+
+              -comando ($ wget https://download.nextcloud.com/server/releases/nextcloud-21.0.1.zip).
+
+            Una vez que el archivo comprimido de NextCloud esté completo, descomprímalo en la ruta /var/www/html
+
+              -comando ($ sudo unzip nextcloud-21.0.1.zip -d /var/www/html/).
+
+            A partir de entonces, configure los permisos de directorio para el usuario y grupo www-data como se muestra.
+              -comando ($ sudo chown -R www-data:www-data /var/www/html/nextcloud).
+
+             Una vez hecho esto, considere configurar los permisos como se muestra para otorgar permisos de lectura y ejecución a los usuarios globales.
+              -comando ($ sudo chmod -R 775 /var/www/html/nextcloud).
+
+      -Paso 5: Cree un archivo de configuración para NextCloud
+
+            -A continuación, definiremos un archivo de configuración que actúa como un archivo de host virtual para NextCloud.
+             Entonces, proceda y cree un archivo de configuración nextcloud.conf de la siguiente manera.
+                -comando ($ sudo vim /etc/apache2/sites-available/nextcloud.conf).
+
+             Agregue las líneas que se muestran a continuación. Para el atributo ServerName , proporcione el FQDN de su
+             servidor o dirección IP si no tiene un nombre de dominio que apunte a su IP.
+             Guarde y salga del archivo de configuración del host virtual. Luego habilítelo de la siguiente manera.
+                 -comando ($ sudo a2ensite nextcloud.conf).
+
+             Además, habilite los módulos del servidor web Apache que serán necesarios más adelante.
+                 -comando ($ sudo a2ensite rewrite headers dir mime env setenvif ssl).
+
+             Por último, vuelva a cargar el servidor web Apache.
+                 -comando ($ sudo systemctl reload apache2).
+
+      -Paso 5: Complete la configuración de NextCloud
+
+             En este punto, hemos concluido todas las configuraciones. Para terminar con la configuración de NextCloud,
+              abra su navegador y diríjase a la URL indicada.
+              Se le pedirá que proporcione su nombre de usuario y los detalles de la base de datos como se muestra en los
+              fragmentos a continuación.
+
+              Finalmente presione el botón ' Terminar configuración '.
+              Se le dará un recorrido por los pasos preliminares que debe seguir
+              Y finalmente, se mostrará el tablero de NextCloud.
+              Ahora puede cargar sus archivos y colaborar con los miembros de su equipo en NextCloud.
+
+
+
+Cómo instalar y configurar Postfix en Ubuntu 18.04:
+
+    - Le enseñaremos empezar a utilizar rápidamente Postfix en un servidor de Ubuntu 18.04..
+
+       - Introducción:
+         Postfix es un popular agente de transferencia de correo (MTA) de código abierto que puede usarse para dirigir
+         y entregar correo electrónico en un sistema Linux.
+
+       - Requisitos previos: debe tener acceso a un usuario no root con privilegios sudo
+       - Para configurar Postfix de forma correcta, necesitará un nombre de dominio completamente apto que apunte a su
+          servidor de Ubuntu 18.04.
+
+    - Paso 1:
+       - Instalar Postfix: Postfix está incluido en los repositorios predeterminados de Ubuntu, por lo que la instalación es sencilla.
+
+       Para comenzar, actualice su caché de paquetes apt local e instale el software. Pasaremos la variable ambiental
+       DEBIAN_PRIORITY=low a nuestro comando de instalación para responder a algunas peticiones adicionales:
+
+       - comandos(sudo apt update
+         sudo DEBIAN_PRIORITY=low apt install postfix)
+
+       - Para brindar explicitud, estos son los ajustes que emplearemos para esta guía:
+
+         ¿Tipo general de configuración del correo?: sitio de Internet
+         Nombre del sistema de correo: example.com (no mail.example.com)
+         Destinatario de correo root y postmaster: sammy
+         Otros destinos para los que se aceptará correo: $myhostname, example.com, mail.example.com, localhost.example.com, localhost
+         ¿Forzar actualizaciones sincronizadas en la cola de correo? :No
+         Redes locales: []127.0.00.0/8 ::fff:127.0.0/104 []::1/128
+         Límite de tamaño del buzón de correo: 0
+         Carácter de extensión de dirección local: +
+         Protocolos de Internet que se utilizarán: Todos
+
+       - Si alguna vez necesita volver para configurar estos ajustes, puede hacerlo escribiendo lo siguiente:
+
+       - comandos(sudo dpkg-reconfigure postfix).
+
+    -Paso 2: Ajustar la configuración de Postfix
+
+        - A continuación, podemos retocar algunos ajustes que el paquete no nos solicitó.
+
+          Para comenzar, podemos establecer el buzón de correo. Usaremos el formato Maildir, que separa los mensajes en
+          archivos individuales que luego se mueven entre directorios según la acción del usuario. La otra opción es el
+          formato mbox (no lo abordaremos aquí), que almacena todos los mensajes en un único archivo.
+
+          Fijaremos la variable home_mailbox en Maildir/, que creará una estructura de directorios bajo ese nombre
+          dentro del directorio principal del usuario. El comando postconf puede usarse para consultar o fijar los ajustes
+          de configuración. Configure home_mailbox escribiendo lo siguiente:
+
+
+           - comandos(sudo postconf -e 'home_mailbox= Maildir/').
+
+        - A continuación, podemos establecer la ubicación de la tabla virtual_alias_maps. Esta tabla asigna cuentas de
+          correo electrónico arbitrarias a las cuentas del sistema Linux. Crearemos esta tabla en /etc/postfix/virtual.
+          Una vez más, podemos usar el comando postconf:
+           - comandos(sudo postconf -e 'virtual_alias_maps= hash:/etc/postfix/virtual').
+
+    -Paso 3: Asignar direcciones de correo a cuentas de Linux
+
+        -A continuación, podemos configurar el archivo de mapas virtuales. Abra el archivo en su editor de texto:
+
+        - comandos(sudo nano /etc/postfix/virtual).
+
+        -La tabla de asignación virtual de alias utiliza un formato muy simple. A la izquierda, puede enumerar las
+         direcciones para las que desee aceptar correo electrónico. Después, separado por un espacio en blanco,
+         introduzca el usuario Linux al que desee que se entregue el correo.
+
+         Por ejemplo, si desea aceptar correo electrónico en contact@example.com y admin@example.com y quiere que esos
+          correos electrónicos se entreguen al usuario de Linux sammy, podría configurar su archivo de la siguiente forma:
+
+         -Después de asignar todas las direcciones a las cuentas del servidor correspondientes, guarde y cierre el archivo.
+
+          Puede aplicar la asignación escribiendo lo siguiente:
+
+             - comandos(sudo postmap /etc/postfix/virtual).
+
+         -Reinicie el proceso Postfix para asegurarse de que todos nuestros cambios se hayan aplicado:
+
+             - comandos(sudo systemctl restart postfix).
+
+    -Paso 4: Ajustar el firewall:
+
+        -Si utiliza el firewall UFW, conforme a los ajustes de la guía de configuración inicial para servidores, tendremos que permitir una excepción para Postfix.
+
+         Puede permitir conexiones al servicio escribiendo lo siguiente:
+         - comandos(sudo ufw allow Postfix).
+
+         El componente de servidor de Postfix está instalado y listo. A continuación, configuraremos un cliente que
+         pueda gestionar el correo que Postfix procesará.
+
+    -Paso 5: Configurar el entorno para que se adapte a la ubicación de correo:
+
+        -Antes de instalar un cliente, debemos asegurarnos de que nuestra variable de entorno MAIL esté configurada de
+         forma correcta. El cliente inspeccionará esta variable para determinar dónde buscar el correo del usuario.
+
+         Para que la variable se establezca independientemente de cómo acceda a su cuenta (a través de ssh, su, su -,
+         sudo, etc.), debemos fijar algunas ubicaciones diferentes para la variable. La añadiremos a /etc/bash.bashrc y
+          un archivo en /etc/profile.d para asegurarnos de que cada usuario tenga esto configurado.
+
+         Para agregar la variable a estos archivos, escriba lo siguiente:
+
+            - comandos(echo 'export MAIL=~/Maildir' | sudo tee -a /etc/bash.bashrc | sudo tee -a /etc/profile.d/mail.sh).
+
+         Para leer la variable en su sesión actual, puede recurrir al archivo /etc/profile.d/mail.sh:
+
+           - comandos(source /etc/profile.d/mail.sh).
+
+    -Paso 6: Instalar y configurar el cliente de correo
+           - Para interactuar con el correo que se envía, instalaremos el paquete s-nail. Esta es una variante del cliente xmail de BSD, que cuenta con una gran variedad de funciones, puede gestionar el formato Maildir correctamente y, mayormente, es compatible con versiones anteriores. La versión GNU de mail tiene algunas limitaciones, como guardar siempre el correo leído en el formato mbox independientemente del formato de origen.
+
+           - Para instalar el paquete s-nail, escriba lo siguiente:
+           - comandos(sudo apt install s-nail).
+           - Deberíamos configurar algunos ajustes. Abra el archivo /etc/s-nail.rc en su editor:
+           - comandos(sudo nano /etc/s-nail.rc).
+           - sto permitirá al cliente abrirse incluso con una bandeja de entrada vacía. También fijará el directorio
+             Maildir en la variable interna folder y luego usará esto para crear un archivo mbox sent para almacenar el
+             correo enviado.
+
+             Guarde y cierre el archivo cuando haya terminado.
+
+    - Paso 7: Inicializar Maildir y probar el cliente :
+
+           -Ahora, podremos probar el cliente.
+
+            Inicialiar la estructura del directorio
+            La forma más sencilla de crear la estructura de Maildir en nuestro directorio de inicio es enviar un
+            correo electrónico para nosotros mismos. Podemos hacer esto con el comando s-nail. Debido a que el archivo
+            enviado solo estará disponible una vez que se cree Maildir, deberíamos deshabilitar la escritura para nuestro
+            correo electrónico inicial. Podemos hacer esto pasando la opción -Snorecord.
+
+            Envíe el correo electrónico dirigiendo una cadena al comando s-nail. Ajuste el comando para marcar su usuario
+            Linux como el destinatario:
+
+             - comandos(echo 'init' | s-nail -s 'init' -Snorecord sammy).
+
+            -Esto es normal y puede aparecer únicamente cuando se envíe este primer mensaje. Podemos comprobar que el
+             directorio se haya creado buscando nuestro directorio ~/Maildir:
+
+             - comandos(ls -R ~/Maildir).
+
+            -Debería ver que la estructura del directorio se ha creado y que hay un nuevo archivo de mensaje en el
+            directorio ~/Maildir/new:
+
+           -Parece que nuestro correo se entregó.
