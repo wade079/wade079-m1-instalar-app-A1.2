@@ -391,3 +391,4 @@ Cómo instalar y configurar Postfix en Ubuntu 18.04:
             directorio ~/Maildir/new:
 
            -Parece que nuestro correo se entregó.
+
